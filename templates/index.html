@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Flash — AI Flashcards{% endblock %}
+{% block content %}
+ 
+<section class="hero">
+    <div class="hero-label">AI-Assisted Learning</div>
+    <h1 class="hero-title">Study smarter,<br><em>not harder.</em></h1>
+    <p class="hero-sub">Upload your notes. Flash generates flashcards, tracks difficulty, and schedules your reviews using spaced repetition.</p>
+    <div class="hero-actions">
+        <a href="{{ url_for('upload') }}" class="btn btn--primary">Generate Flashcards</a>
+        <a href="{{ url_for('review') }}" class="btn btn--outline">Start Review</a>
+    </div>
+</section>
+ 
+<section class="stats">
+    <div class="stat-card">
+        <span class="stat-number">{{ stats.total }}</span>
+        <span class="stat-label">Total Cards</span>
+    </div>
+    <div class="stat-card stat-card--highlight">
+        <span class="stat-number">{{ stats.due }}</span>
+        <span class="stat-label">Due Today</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number">{{ stats.mastered }}</span>
+        <span class="stat-label">Mastered</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-number">{{ stats.flagged }}</span>
+        <span class="stat-label">Flagged</span>
+    </div>
+</section>
+ 
+
+ 
+{% endblock %}
+ 

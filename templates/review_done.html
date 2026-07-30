@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Session Complete — AIFC{% endblock %}
+{% block content %}
+
+<div class="done-container">
+    <div class="done-icon">✓</div>
+    <h1 class="done-title">Session Complete</h1>
+    <p class="done-sub">You've reviewed all cards due today. Come back tomorrow for your next session.</p>
+    <div class="done-actions">
+        <a href="{{ url_for('index') }}" class="btn btn--outline">Dashboard</a>
+        <a href="{{ url_for('upload') }}" class="btn btn--primary">Generate More Cards</a>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Library — AIFC{% endblock %}
+{% block content %}
+ 
+
+<div class="page-header">
+    <h1 class="page-title">Card Library</h1>
+    <p class="page-sub">{{ cards|length }} cards total</p>
+</div>
+ 
+
+{% if not cards %}
+<div class="empty-state">
+    <p>No flashcards yet.</p>
+    <a href="{{ url_for('upload') }}" class="btn btn--primary">Generate your first cards</a>
+</div>
+ 
+{% else %}
+ 
+
+<div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="easy">Easy</button>
+    <button class="filter-btn" data-filter="medium">Medium</button>
+    <button class="filter-btn" data-filter="hard">Hard</button>
+    <button class="filter-btn" data-filter="flagged">Flagged</button>
+</div>
+ 
+<!-- Cards grid -->
+<div class="cards-grid">
+    {% for card in cards %}
+    
+    <div class="card-item {% if card.flagged %}card-item--flagged{% endif %}" data-difficulty="{{ card.difficulty }}" data-flagged="{{ card.flagged }}">
+ 
+        <!-- Card header -->
+        <div class="card-item-header">
+            <span class="difficulty-badge difficulty-badge--{{ card.difficulty }}">{{ card.difficulty }}</span>
+            <span class="card-ef">EF {{ "%.2f"|format(card.easiness) }}</span>
+        </div>
+ 
+        <!-- Card content -->
+        <p class="card-item-question">{{ card.question }}</p>
+        <p class="card-item-answer">{{ card.answer }}</p>
+ 
+        
+        {% if card.source_snippet %}
+        <details class="card-snippet-toggle">
+            <summary>Source snippet</summary>
+            <blockquote class="snippet-text snippet-text--sm">{{ card.source_snippet }}</blockquote>
+        </details>
+        {% endif %}
+ 
+        <!-- restore flagged cards or delete permanently -->
+        <div class="card-item-actions">
+            {% if card.flagged %}
+            <!-- Restore button -->
+            <form method="POST" action="{{ url_for('unflag', card_id=card.id) }}" style="display:inline">
+                <button type="submit" class="btn-sm btn-sm--restore">Restore</button>
+            </form>
+            {% endif %}
+            <!-- Delete button -->
+            <form method="POST" action="{{ url_for('delete', card_id=card.id) }}" style="display:inline" onsubmit="return confirm('Delete this card?')">
+                <button type="submit" class="btn-sm btn-sm--delete">Delete</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+ 
+<script>
+    var filterBtns = document.querySelectorAll('.filter-btn');
+    var cardItems = document.querySelectorAll('.card-item');
+ 
+    for (var i = 0; i < filterBtns.length; i++) {
+        filterBtns[i].addEventListener('click', function() {
+           
+            for (var j = 0; j < filterBtns.length; j++) {
+                filterBtns[j].classList.remove('active');
+            }
+            this.classList.add('active');
+ 
+            var filter = this.dataset.filter;
+ 
+            // Show or hide cards
+            for (var k = 0; k < cardItems.length; k++) {
+                if (filter === 'all') {
+                    cardItems[k].style.display = '';
+                } else if (filter === 'flagged') {
+                    cardItems[k].style.display = cardItems[k].dataset.flagged === '1' ? '' : 'none';
+                } else {
+                    cardItems[k].style.display = cardItems[k].dataset.difficulty === filter ? '' : 'none';
+                }
+            }
+        });
+    }
+</script>
+ 
+{% endblock %}

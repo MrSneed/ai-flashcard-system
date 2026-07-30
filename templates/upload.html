@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Generate — AIFl{% endblock %}
+{% block content %}
+ 
+<div class="page-header">
+    <h1 class="page-title">Generate Flashcards</h1>
+    <p class="page-sub">Upload a PDF or TXT file, or paste a text snippet below.</p>
+</div>
+ 
+<div class="upload-container">
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+ 
+        <div class="form-section">
+            <label class="form-label">Upload File</label>
+            <div class="drop-zone" id="dropZone">
+                <input type="file" name="file" id="fileInput" accept=".pdf,.txt" class="file-input">
+                <div class="drop-zone-content">
+                    <div class="drop-icon">↑</div>
+                    <p class="drop-text">Drop a PDF or TXT file here</p>
+                    <p class="drop-sub">or <label for="fileInput" class="drop-browse">browse files</label></p>
+                    <p class="drop-limit">Max 5MB</p>
+                </div>
+                <div class="drop-zone-selected" id="fileSelected" style="display:none;">
+                    <span class="file-icon">📄</span>
+                    <span id="fileName"></span>
+                    <button type="button" class="file-remove" id="removeFile">×</button>
+                </div>
+            </div>
+        </div>
+ 
+        <div class="form-divider"><span>or</span></div>
+ 
+        <div class="form-section">
+            <label class="form-label" for="snippet">Paste Text Snippet</label>
+            <textarea name="snippet" id="snippet" class="form-textarea" placeholder="Paste your notes, paragraphs, or any text content here..." rows="6"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 10,000 characters</div>
+        </div>
+ 
+        <div class="form-section form-section--inline">
+            <label class="form-label" for="num_cards">Number of flashcards to generate</label>
+            <div class="num-cards-control">
+                <button type="button" class="num-btn" id="numDown">−</button>
+                <input type="number" name="num_cards" id="num_cards" value="5" min="1" max="20" class="num-input">
+                <button type="button" class="num-btn" id="numUp">+</button>
+            </div>
+        </div>
+ 
+        <button type="submit" class="btn btn--primary btn--full">Generate Flashcards</button>
+    </form>
+</div>
+ 
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileSelected = document.getElementById('fileSelected');
+    const fileName = document.getElementById('fileName');
+    const dropContent = dropZone.querySelector('.drop-zone-content');
+ 
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files[0]) {
+            fileName.textContent = fileInput.files[0].name;
+            fileSelected.style.display = 'flex';
+            dropContent.style.display = 'none';
+        }
+    });
+ 
+    document.getElementById('removeFile').addEventListener('click', () => {
+        fileInput.value = '';
+        fileSelected.style.display = 'none';
+        dropContent.style.display = 'flex';
+    });
+ 
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragging'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragging');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            fileInput.files = e.dataTransfer.files;
+            fileName.textContent = file.name;
+            fileSelected.style.display = 'flex';
+            dropContent.style.display = 'none';
+        }
+    });
+ 
+    // Char count
+    const snippet = document.getElementById('snippet');
+    const charCount = document.getElementById('charCount');
+    snippet.addEventListener('input', () => {
+        charCount.textContent = snippet.value.length;
+        if (snippet.value.length > 9000) charCount.style.color = 'var(--warning)';
+        else charCount.style.color = '';
+    });
+ 
+    // Num cards 
+    const numInput = document.getElementById('num_cards');
+    document.getElementById('numDown').addEventListener('click', () => {
+        if (numInput.value > 1) numInput.value--;
+    });
+    document.getElementById('numUp').addEventListener('click', () => {
+        if (numInput.value < 20) numInput.value++;
+    });
+</script>
+ 
+{% endblock %}

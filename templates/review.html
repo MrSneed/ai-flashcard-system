@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}Review — AIFC{% endblock %}
+{% block content %}
+ 
+<div class="review-container">
+ 
+    <!-- Progress bar -->
+    <div class="review-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ (progress.current / progress.total * 100)|int }}%"></div>
+        </div>
+        <span class="progress-label">{{ progress.current }} / {{ progress.total }}</span>
+    </div>
+ 
+    <!-- Difficulty-->
+    <div class="difficulty-badge difficulty-badge--{{ card.difficulty }}">{{ card.difficulty }}</div>
+ 
+    
+    <div class="flashcard {% if revealed %}flashcard--revealed{% endif %}">
+        <div class="flashcard-inner">
+ 
+            <!-- Question -->
+            <div class="flashcard-front">
+                <div class="card-label">Question</div>
+                <p class="card-text">{{ card.question }}</p>
+                <!-- Reveal button -->
+                {% if not revealed %}
+                <a href="{{ url_for('reveal_card', card_id=card.id) }}" class="btn btn--primary btn--reveal">Reveal Answer</a>
+                {% endif %}
+            </div>
+ 
+            <!-- Answer -->
+            {% if revealed %}
+            <div class="flashcard-answer">
+                <div class="card-label">Answer</div>
+                <p class="card-text card-text--answer">{{ card.answer }}</p>
+            </div>
+ 
+            <!-- Source snippet  -->
+            {% if card.source_snippet %}
+            <div class="source-snippet">
+                <div class="snippet-label">Source</div>
+                <blockquote class="snippet-text">{{ card.source_snippet }}</blockquote>
+            </div>
+            {% endif %}
+ 
+            <!-- Feedback form  -->
+            <form method="POST" action="{{ url_for('submit_review', card_id=card.id) }}" class="feedback-form">
+ 
+                <!-- Recall quality rating  -->
+                <div class="recall-section">
+                    <p class="recall-label">How well did you remember this?</p>
+                    <div class="recall-buttons">
+                        <!-- Forgot  -->
+                        <label class="recall-option recall-option--forgot">
+                            <input type="radio" name="quality" value="0">
+                            <span class="recall-btn">
+                                <span class="recall-icon">✗</span>
+                                <span class="recall-text">Forgot</span>
+                            </span>
+                        </label>
+                        <!-- Hard -->
+                        <label class="recall-option recall-option--hard">
+                            <input type="radio" name="quality" value="3">
+                            <span class="recall-btn">
+                                <span class="recall-icon">~</span>
+                                <span class="recall-text">Hard</span>
+                            </span>
+                        </label>
+                        <!-- Got it -->
+                        <label class="recall-option recall-option--got">
+                            <input type="radio" name="quality" value="5">
+                            <span class="recall-btn">
+                                <span class="recall-icon">✓</span>
+                                <span class="recall-text">Got it</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+ 
+                <!-- Flag card-->
+                <div class="flag-section">
+                    <label class="flag-toggle">
+                        <input type="checkbox" name="flagged" value="1" id="flagToggle">
+                        <span class="flag-label"> Flag this card as incorrect or unclear</span>
+                    </label>
+                    <!-- comment box -->
+                    <div class="flag-comment" id="flagComment" style="display:none;">
+                        <textarea name="comment" class="form-textarea form-textarea--sm" placeholder="What's wrong with this card? (optional)"></textarea>
+                    </div>
+                </div>
+ 
+                <!-- Submit button -->
+                <button type="submit" class="btn btn--primary btn--full" id="submitBtn" disabled>Next Card →</button>
+            </form>
+            {% endif %}
+ 
+        </div>
+    </div>
+ 
+   
+    <div class="card-meta">
+        <span>EF: {{ "%.2f"|format(card.easiness) }}</span>
+        <span>Interval: {{ card.interval }}d</span>
+        <span>Reps: {{ card.repetitions }}</span>
+    </div>
+</div>
+ 
+<script>
+    // Enable submit button when a quality rating is selected or card is flagged
+    var radios = document.querySelectorAll('input[name="quality"]');
+    var submitBtn = document.getElementById('submitBtn');
+    var flagToggle = document.getElementById('flagToggle');
+    var flagComment = document.getElementById('flagComment');
+ 
+    function updateSubmitBtn() {
+        var qualitySelected = false;
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked) {
+                qualitySelected = true;
+                break;
+            }
+        }
+        var isFlagged = flagToggle.checked;
+        submitBtn.disabled = !qualitySelected && !isFlagged;
+    }
+ 
+    
+    for (var i = 0; i < radios.length; i++) {
+        radios[i].addEventListener('change', updateSubmitBtn);
+    }
+ 
+    // update button when flag is checked
+    flagToggle.addEventListener('change', function() {
+        flagComment.style.display = flagToggle.checked ? 'block' : 'none';
+        updateSubmitBtn();
+    });
+</script>
+ 
+{% endblock %}
+ 
