@@ -23,8 +23,9 @@ SECRET_KEY=your_secret_key
 
 4. Run the application:
 
+```env
 python app.py
-
+```
 
 5. Open the local URL provided in your browser.
 
